@@ -1,0 +1,41 @@
+---
+title: '信息的表示和处理'
+description: 'Representing and Manipulating Information'
+heroImage: {src: './illustrate.png'}
+publishDate: '2025-07-08'
+tags: 
+ - csapp
+ - cs
+language: 'Chinese'
+---
+import {Aside} from 'astro-pure/user';
+
+## 信息存储
+
+
+
+## 无符号加法
+
+对于满足$0\le x,y\le 2^w$的$x$和$y$有
+$$
+x+^u_w y=
+\begin{cases}
+x+y,x+y< 2^w\\
+x+y-2^w,x+y>2^w
+\end{cases}
+$$
+
+<Aside title='检测无符号加法的溢出'>
+对于满足$0\le x,y\le 2^w$的$x$和$y$,如果$x+y< x$或者$x+y< y$,则溢出.
+</Aside>
+
+## 补码加法
+对于满足$-2^{w-1}< x,y< 2^{w-1}-1$的$x$和$y$有
+$$
+x+^t_w y=
+\begin{cases}
+x+y-2^w,&x+y\ge2^{w-1}\qquad\qquad&\text{正溢出}\\
+x+y,&-2^{w-1}\le x+y< 2^{w-1}\\
+x+y+2^w,&x+y< -2^{w-1}\qquad\qquad&\text{负溢出}
+\end{cases}
+$$

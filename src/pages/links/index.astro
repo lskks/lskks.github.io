@@ -1,0 +1,20 @@
+---
+import links from 'public/links.json'
+import config from 'virtual:config'
+
+import { Comment } from 'astro-pure/advanced'
+import { Collapse, Timeline } from 'astro-pure/user'
+import PageLayout from '@/layouts/CommonPage.astro'
+import FriendList from '@/components/links/FriendList.astro'
+
+const headings = [
+  { depth: 2, slug: 'common-links', text: 'Common Links' },
+  { depth: 2, slug: 'special-links', text: 'Special Links' },
+  { depth: 2, slug: 'apply-links', text: 'Apply Links' }
+]
+
+---
+
+<PageLayout title='Links' {headings} info='/links'>
+
+</PageLayout>
