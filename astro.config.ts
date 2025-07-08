@@ -26,7 +26,7 @@ import config from './src/site.config.ts'
 export default defineConfig({
   // Top-Level Options
   site: 'https://lskks.github.io',
-  base: '/Note',
+  base: '/',
   trailingSlash: 'never',
 
   // Adapter
