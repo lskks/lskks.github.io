@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet href="/scripts/pretty-feed-v3.xsl" type="text/xsl"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:h="http://www.w3.org/TR/html4/"><channel><title>Note</title><description>Some note about math&amp; cs</description><link>https://lskks.github.io</link><item><title>信息的表示和处理</title><link>https://lskks.github.io/blog/csapp/chapter2</link><guid isPermaLink="true">https://lskks.github.io/blog/csapp/chapter2</guid><description>Representing and Manipulating Information</description><pubDate>Tue, 08 Jul 2025 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;import {Aside} from &apos;astro-pure/user&apos;;
+import {Label} from &apos;astro-pure/user&apos;;&lt;/p&gt;
+&lt;h2&gt;信息存储&lt;/h2&gt;
+&lt;h3&gt;十六进制表示法&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;./hexadecimal.png&quot; alt=&quot;进制&quot; title=&quot;16进制与2进制和10进制的关系&quot;&gt;&lt;/p&gt;
+&lt;p&gt;十进制和十六进制表示之间的转换需要使用乘法或者除法来处理.一般情况,将一个十进制数字$x$转换为十六进制，可以反复地用$16$除$x$,得到一个商$q$和一个余数$r$,也就是$x=q\times16+r$.然后，我们用十六进制数字表示的$r$作为最低位数字,并且通过对$q$反复进行这个过程得到剩下的数字。&lt;/p&gt;
+&lt;p&gt;例如,考虑十进制$314156$的转换:
+$$
+\begin{aligned}
+314156 &amp;#x26; = 19635 \times 16 + 12 &amp;#x26;\qquad (C)\
+19635 &amp;#x26; = 1227 \times 16 + 3 &amp;#x26;\qquad (2)\
+1227 &amp;#x26; = 76 \times 16 + 11 &amp;#x26;\qquad(B) \
+76 &amp;#x26; = 4 \times 16 + 12 &amp;#x26;\qquad (C)\
+4 &amp;#x26; = 0 \times 16 + 4 &amp;#x26;\qquad (4)
+\end{aligned}&lt;br&gt;
+$$
+所以,十进制数$314156$的十六进制表示为$\mathrm{0x4CB2C}$.&lt;/p&gt;
+&lt;p&gt;同样的,将一个十六进制数字转换为十进制数字，我们可以用相应的$16$的幂乘以每个十六进制数字。&lt;/p&gt;
+&lt;p&gt;例如:将十六进制数$\mathrm{0x7AF}$转换为十进制:
+$$
+7\times 16^2 + 10 \times 16^1 + 15 \times 16^0 = 7 \times 256 + 10 \times 16 + 15 \times 1 = 1967
+$$&lt;/p&gt;
+&lt;h3&gt;字数据的大小&lt;/h3&gt;
+&lt;p&gt;下图为 &lt;code&gt;C语言&lt;/code&gt; 中的数据类型的大小,其中&lt;code&gt;int&lt;/code&gt;和&lt;code&gt;long&lt;/code&gt;的大小与编译器有关,通常在32位系统中为4字节,在64位系统中为8字节.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;./data_size.png&quot; alt=&quot;字数据的大小&quot; title=&quot;字数据的大小&quot;&gt;&lt;/p&gt;
+&lt;h3&gt;寻址和字节顺序&lt;/h3&gt;
+&lt;h2&gt;整数运算&lt;/h2&gt;
+&lt;h3&gt;无符号加法&lt;/h3&gt;
+&lt;p&gt;对于满足$0\le x,y\le 2^w$的$x$和$y$有
+$$
+x+^u_w y=
+\begin{cases}
+x+y,x+y&amp;#x3C; 2^w\
+x+y-2^w,x+y&gt;2^w
+\end{cases}
+$$&lt;/p&gt;
+&lt;h3&gt;补码加法&lt;/h3&gt;
+&lt;p&gt;对于满足$TMin_w \le x,y \le TMax_w$的$x$和$y$有
+$$
+x+^t_w y=
+\begin{cases}
+x+y-2^w,&amp;#x26;x+y\ge2^{w-1}\qquad\qquad&amp;#x26;\text{正溢出}\
+x+y,&amp;#x26;-2^{w-1}\le x+y&amp;#x3C; 2^{w-1}\
+x+y+2^w,&amp;#x26;x+y&amp;#x3C; -2^{w-1}\qquad\qquad&amp;#x26;\text{负溢出}
+\end{cases}
+$$&lt;/p&gt;
+&lt;h3&gt;补码的非&lt;/h3&gt;
+&lt;p&gt;对于满足$TMin_w \le x\le TMax_w$的$x$有
+$$
+-^t_w x =
+\begin{cases}
+TMin_w, &amp;#x26;x=TMax_w\
+-x,&amp;#x26;x&gt;TMin_w
+\end{cases}
+$$&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;补码的非的位级表示&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;方法1: 将$x$的每一位取反,然后加1.
+即-x与~x+1的值是相同的.&lt;/p&gt;
+&lt;p&gt;方法2: 假设$x$的位级表示为
+$$
+[x_{w-1},x_{w-2},\cdots,x_{k+1},1,0,\cdots,0]
+$$
+其中,$k$为最右边的一个$1$,只要$x\ne0$,就一定存在这样的$k$.&lt;/p&gt;
+&lt;p&gt;那么$-^t_w x$的位级表示为
+$$
+[\verb|~|x_{w-1},\verb|~|x_{w-2},\cdots,\verb|~|x_{k+1},1,0,\cdots,0]
+$$&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;无符号乘法&lt;/h3&gt;
+&lt;p&gt;对于满足$0\le x,y\le UMax_w$的$x$和$y$有
+$$
+x *^u_w y=(x\cdot y)\bmod 2^w
+$$&lt;/p&gt;
+&lt;h3&gt;补码乘法&lt;/h3&gt;
+&lt;p&gt;对于满足$TMin_w \le x,y \le TMax_w$的$x$和$y$有
+$$
+x*^t_w y=U2T_w((x\cdot y)\bmod 2^w)
+$$&lt;/p&gt;
+&lt;h3&gt;乘以常数&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;乘以$2$的幂&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;设无符号整数$x$的位级表示为$[x_{w-1},x_{w-2},\cdots,x_0]$,那么,对于任意的$k\ge0$,
+向$x$的右侧加$k$个$0$得到$[x_{w-1},x_{w-2},\cdots,x_0,\cdots,0]$这是$x2^k$的位级表示&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;与$2$的幂相乘的无符号乘法&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;对于无符号整数$x$和$k$,其中$0\le k&amp;#x3C; w$,C表达式&lt;code&gt;x&amp;#x3C;&amp;#x3C;k&lt;/code&gt;会得到$x*^u_w2^k$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;与$2$的幂相乘的补码乘法&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;对于补码$x$和无符号整数$k$,其中$0\le k&amp;#x3C; w$,C表达式&lt;code&gt;x&amp;#x3C;&amp;#x3C;k&lt;/code&gt;会得到$x*^u_w2^k$&lt;/p&gt;
+&lt;p&gt;对于一组$0$和$1$交替的序列
+$$
+[(0\cdots 0)(1\cdots 1)\cdots(0\cdots 0)(1\cdots 1)]
+$$
+对于一组从位位置$n$到位位置$m$的连续的$l$($n\le m$).可以用下面两种不同形式中的一种来计算这些位对乘积的影响&lt;/p&gt;
+&lt;p&gt;$$
+\begin{aligned}
+&amp;#x26;\text{形式A}:(x&amp;#x3C;&amp;#x3C;n)+(x&amp;#x3C;&amp;#x3C;(n-1))+\cdots+(x&amp;#x3C;&amp;#x3C;m)\
+&amp;#x26;\text{形式B}:(x&amp;#x3C;&amp;#x3C;(n+1))-(x&amp;#x3C;&amp;#x3C;m)
+\end{aligned}
+$$&lt;/p&gt;
+&lt;h3&gt;除以2的幂&lt;/h3&gt;</content:encoded><h:img src="/_astro/illustrate.BlMB6n9k.png"/><enclosure url="/_astro/illustrate.BlMB6n9k.png"/></item><item><title>discrete math</title><link>https://lskks.github.io/blog/discretemath/chapter1/test</link><guid isPermaLink="true">https://lskks.github.io/blog/discretemath/chapter1/test</guid><description>the fist file to do test</description><pubDate>Tue, 08 Jul 2025 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;import {Aside} from &apos;astro-pure/user&apos;&lt;/p&gt;
+&lt;h2&gt;命题&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;命题&lt;/strong&gt;是一个陈述语句(即陈述事实的语句),它或真或假,但不能既真又假.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;定义1&lt;/strong&gt;$\qquad$令$p$为一命题.则$p$的否定命题记为$\neg p$(也可以记为$\over p$),指&quot;不是$p$所指的情形&quot;,命题$\neg p$读作&quot;非$p$&quot;,$p$的否定($\neg p$)的真值与$p$的真值相反.&lt;/p&gt;
+&lt;p&gt;| $p$ | $\neg p$ |
+| :--: | :--: |
+| T | F |
+| F | T |&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;定义2&lt;/strong&gt;$\qquad$令$p$和$q$为命题.$p,q$的合取即命题&quot;$p$并且$q$&quot;,记作$p\wedge q$当$p$和$q$都是真时，$p\wedge q$命题为真,否则为假.&lt;/p&gt;
+&lt;p&gt;| $p$ | $q$ | $p\wedge q$ |
+| :-: | :-: | :---------: |
+|  T  |  T  |      T      |
+|  T  |  F  |      F      |
+|  F  |  T  |      F      |
+|  F  |  F  |      F      |&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在离散数学中,有时也用&quot;但是&quot;表示&quot;而且&quot;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;定义3&lt;/strong&gt;$\qquad$令$p$和$q$为命题.$p,q$的析取即命题&quot;$p$或&quot;,记作$p\vee q$当$p$和$q$均为假时，$p\vee q$命题为假,否则为真.&lt;/p&gt;
+&lt;p&gt;| $p$ | $q$ | $p\vee q$ |
+| :--: | :--: | :--: |
+| T | T | T |
+| T | F | T |
+| F | T | T |
+| F | F | F |&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;定义4$\qquad$&lt;/strong&gt; 令$p$和$q$为命题.$p$和$q$的异或(记作$p\oplus q$)是这样一个命题:当$p$和$q$中恰好只有一个为真时命题为真,否则为假.&lt;/p&gt;
+&lt;p&gt;| $p$ | $q$ | $p\oplus q$ |
+| :--: | :--: | :--: |
+| T | T | F |
+| T | F | T |
+| F | T | T |
+| F | F | F |&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;兼或&lt;/strong&gt;是指两命题可以同时成立,&lt;strong&gt;异或&lt;/strong&gt;指两命题只有一个成立.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;条件语句&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;定义5$\qquad$&lt;/strong&gt; 令$p$和$q$为命题.条件语句$p\to q$是命题&quot;如果$p$,则$q$&quot;:.当$p$为真而$q$为假时,条件语句$p\to q$为假,否则为真.在条件语句$p\to q$中,$p$称为假设(前件,前提),$q$称为结论(后件).&lt;/p&gt;
+&lt;p&gt;| $p$ | $q$ | $p\to q$ |
+| :--: | :--: | :--: |
+| T | T | T |
+| T | F | F |
+| F | T | T |
+| F | F | T |&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;表达$p\to q$的语句有很多,常见的如下&lt;/p&gt;
+&lt;p&gt;“如果$p$，则$q$”
+“如果$p$, $q$”
+“$p$是$q$的充分条件”
+“$q$如果$p$”
+“$q$ 当$p$”
+“$p$的必要条件是$q$”
+“$q$除非$p$”
+“$p$蕴含$q$”
+“$q$仅当$p$”
+“$q$的充分条件是$p$”
+“$q$每当$p$”
+“$q$是$p$的必要条件”
+“$q$由$p$得出&quot;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;逆命题、逆否命题与反命题&lt;/strong&gt; 由条件语句可以构成一些新的条件语句.特别是三个常见的相关条件语句还拥有特殊的名称.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;命题$q\to p$称为$p\to q$的&lt;strong&gt;逆命题&lt;/strong&gt;,&lt;/li&gt;
+&lt;li&gt;而$p\to q$的&lt;strong&gt;逆否命题&lt;/strong&gt;是命题$\neg q\to\neg p$.&lt;/li&gt;
+&lt;li&gt;命题$\neg p\to\neg q$称为$p\to q$的&lt;strong&gt;反命题&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;双条件命题&lt;/strong&gt;
+&lt;strong&gt;定义6$\qquad$&lt;/strong&gt; 令$p$和$q$为命题.双条件语句$p\leftrightarrow q$是命题“$p$当且仅当$q$&quot;.当$p$和$q$有同样的真值时，双条件语句为真,否则为假.双条件语句也称为双向蕴含.&lt;/p&gt;
+&lt;p&gt;| $p$ | $q$ | $p\leftrightarrow q$ |
+| :--: | :--: | :--: |
+| T | T | T |
+| T | F | F |
+| F | T | F |
+| F | F | T |&lt;/p&gt;
+&lt;h2&gt;复合命题的真值表&lt;/h2&gt;
+&lt;p&gt;$$
+r=2^n
+$$
+其中T与F各$\dfrac{r}2$行&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;| $p$ | $q$ | $\neg q$ | $p\vee\neg q$ | $p\wedge q$ | $(p\vee\neg q)\to(p\wedge q)$ |
+| :--: | :--: | :--: | :--: | :--: | :--: |
+| T | T | F | T | T | T |
+| T | F | T | T | F | F |
+| F | T | F | T | F | T |
+| F | F | T | T | F | F |
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;逻辑运算符的优先级&lt;/h2&gt;
+&lt;p&gt;|        运算符        | 优先级 |
+| :---------------: | :-: |
+|      $\neg$       |  1  |
+|      $\vee$       |  2  |
+|     $\wedge$      |  3  |
+|       $\to$       |  4  |
+| $\leftrightarrow$ |  5  |&lt;/p&gt;
+&lt;h2&gt;逻辑运算和位运算&lt;/h2&gt;
+&lt;p&gt;计算机用&lt;strong&gt;位&lt;/strong&gt;表示信息.位是一个具有两个可能值的符号,即0和1.位一词的含义来自二进制
+数字,因为0和1是数的二进制表示中用到的数字.我们用1表示真,用0表示假.即,1表示T(真),
+0表示F(假).如果一个变量的值或为真或为假,则此变量就称为&lt;strong&gt;布尔变量&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;| 真值 | 位 |
+| :--: | :--: |
+| T | $1$ |
+| F | $0$ |&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;定义7&lt;/strong&gt;$\qquad$&lt;strong&gt;位串&lt;/strong&gt;是0位或多位的序列.位串的长度就是它所含位的数目.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;我们分别用符号$\vee$,$\wedge$和$\oplus$表示&lt;strong&gt;按位OR、按位AND&lt;/strong&gt;和&lt;strong&gt;按位XOR&lt;/strong&gt;运算.&lt;/p&gt;
+&lt;/blockquote&gt;</content:encoded><h:img src="undefined"/><enclosure url="undefined"/></item></channel></rss>
