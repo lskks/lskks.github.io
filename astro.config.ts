@@ -4,6 +4,8 @@ import AstroPureIntegration from 'astro-pure'
 import { defineConfig } from 'astro/config'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
+import AutoImport from 'astro-auto-import';
+import mdx from '@astrojs/mdx';
 
 // Others
 // import { visualizer } from 'rollup-plugin-visualizer'
@@ -51,14 +53,9 @@ export default defineConfig({
     // astro-pure will automatically add sitemap, mdx & unocss
     // sitemap(),
     // mdx(),
-    AstroPureIntegration(config)
-    // (await import('@playform/compress')).default({
-    //   SVG: false,
-    //   Exclude: ['index.*.js']
-    // }),
+    AstroPureIntegration(config),
+    
 
-    // Temporary fix vercel adapter
-    // static build method is not needed
   ],
   // root: './my-project-directory',
 
@@ -111,3 +108,4 @@ export default defineConfig({
     ]
   }
 })
+
